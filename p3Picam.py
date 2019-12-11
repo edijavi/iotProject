@@ -3,6 +3,7 @@
 
 # StringIO is not available in Python 3
 import io
+# import StringIO
 import subprocess
 import os
 import time

@@ -3,19 +3,17 @@ import picamera
 from datetime import datetime
 from subprocess import call
 
-
-motionState = False
-picPath = "/home/pi/AppPyCharm/Pictures/"
+picturesURI = "/home/pi/AppPyCharm/Pictures/"
 
 
-def captureImage(currentTime, picPath):
+def captureImage(currentTime, picturesURI):
     # Generate the picture's name
-    picName = currentTime.strftime("%Y.%m.%d-%H%M%S") + '.jpg'
+    pictureName = currentTime.strftime("%Y.%m.%d-%H%M%S") + '.jpg'
     with picamera.PiCamera() as camera:
         camera.resolution = (1280, 720)
-        camera.capture(picPath + picName)
+        camera.capture(picturesURI + pictureName)
     print("We have taken a picture.")
-    return picName
+    return pictureName
 
 
 def getTime():
@@ -24,23 +22,24 @@ def getTime():
     return currentTime
 
 
-def timeStamp(currentTime, picPath, picName):
+def timeStamp(currentTime, picturesURI, pictureName):
     # Variable for file path
-    filepath = picPath + picName
+    filePath = picturesURI + pictureName
     # Create message to stamp on picture
     message = currentTime.strftime("%Y.%m.%d - %H:%M:%S")
     # Create command to execute
-    timestampCommand = "/usr/bin/convert " + filepath + " -pointsize 36 \
-    -fill red -annotate +700+650 '" + message + "' " + filepath
+    timestampCommand = "/usr/bin/convert " + filePath + " -pointsize 36 \
+    -fill red -annotate +700+650 '" + message + "' " + filePath
     # Execute the command
     call([timestampCommand], shell=True)
-    print("We have timestamped our picture.")
+    print("We have timestamped the picture.")
 
 
+motionState = False
 while True:
     motionState = p3Picam.motion()
     print(motionState)
     if motionState:
         currentTime = getTime()
-        picName = captureImage(currentTime, picPath)
-        timeStamp(currentTime, picPath, picName)
+        pictureName = captureImage(currentTime, picturesURI)
+        timeStamp(currentTime, picturesURI, pictureName)
