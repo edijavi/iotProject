@@ -1,15 +1,24 @@
-import p3Picam
+import os
 import picamera
-from google.cloud import storage
 from datetime import datetime
 from subprocess import call
 
+from google.cloud import storage
+from firebase import firebase
+
+import p3Picam
+
 picturesURI = "/home/pi/AppPyCharm/Pictures/"
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pi/AppPyCharm/iotmotionsensor-e737c-firebase-adminsdk-byfm4-2183495c4a.json"
+firebase = firebase.FirebaseApplication('https://iotmotionsensor-e737c.firebaseio.com')
+client = storage.Client()
+bucket = client.get_bucket('iotmotionsensor-e737c.appspot.com')
 
 
 def captureImage(currentTime, picturesURI):
     # Generate the picture's name
-    pictureName = currentTime.strftime("%Y.%m.%d-%H%M%S") + '.jpg'
+    pictureName = currentTime.strftime("%Y.%m.%d-%H%M%S") + '.png'
     with picamera.PiCamera() as camera:
         camera.resolution = (1280, 720)
         camera.capture(picturesURI + pictureName)
@@ -34,6 +43,8 @@ def timeStamp(currentTime, picturesURI, pictureName):
     # Execute the command
     call([timestampCommand], shell=True)
     print("We have timestamped the picture.")
+    imageBlob = bucket.blob("%s" % pictureName)
+    imageBlob.upload_from_filename(filePath)
 
 
 motionState = False
@@ -45,9 +56,7 @@ while True:
         pictureName = captureImage(currentTime, picturesURI)
         timeStamp(currentTime, picturesURI, pictureName)
 
-        client = storage.Client().from_service_account_json('/home/pi/AppPyCharm/appKey')
-        bucket = client.get_bucket('iot-easv2019.appspot.com')
-        zebraBlob = bucket.get_blob('pictureName')
-        zebraBlob.upload_from_filename(filename='/%s%s' % (picturesURI, pictureName))
+
+
 
 
