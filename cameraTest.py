@@ -1,5 +1,9 @@
-import picamera
 from datetime import datetime
+from google.cloud import storage
+
+import picamera
+
+from firebase import firebase
 
 
 # Setup the camera such that it closes when we are done with it.
@@ -22,7 +26,12 @@ def getTime():
 def main():
     picturesURI = "/home/pi/AppPyCharm/Pictures/"
     currentTime = getTime()
-    captureImage(currentTime, picturesURI)
+    pictureName = captureImage(currentTime, picturesURI)
+
+    client = storage.Client()
+    bucket = client.get_bucket('iot-easv2019.appspot.com')
+    zebraBlob = bucket.get_blob('pictureName')
+    zebraBlob.upload_from_filename(filename='/%s%s' % (picturesURI, pictureName))
 
 
 # Run the Program

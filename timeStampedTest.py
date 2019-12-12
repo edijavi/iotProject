@@ -27,7 +27,7 @@ while picCount < picTotal:
     timestampMessage = currentTime.strftime("%Y.%m.%d - %H:%M:%S")
     # Create time stamp command to have executed
     timestampCommand = "/usr/bin/convert " + completeFilePath + " -pointsize 36 \
-    -fill red -annotate +700+650 '" + timestampMessage + "' " + completeFilePath
+    -fill green -annotate +700+650 '" + timestampMessage + "' " + completeFilePath
     # Actually execute the command!
     call([timestampCommand], shell=True)
     print("We have timestamped our picture!")
