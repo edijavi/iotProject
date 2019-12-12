@@ -1,16 +1,16 @@
 import os
 import picamera
+import p3Picam
 from datetime import datetime
 from subprocess import call
 
 from google.cloud import storage
 from firebase import firebase
 
-import p3Picam
-
 picturesURI = "/home/pi/AppPyCharm/Pictures/"
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pi/AppPyCharm/iotmotionsensor-e737c-firebase-adminsdk-byfm4-2183495c4a.json"
+os.environ[
+    "GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pi/AppPyCharm/iotmotionsensor-e737c-firebase-adminsdk-byfm4-2183495c4a.json"
 firebase = firebase.FirebaseApplication('https://iotmotionsensor-e737c.firebaseio.com')
 client = storage.Client()
 bucket = client.get_bucket('iotmotionsensor-e737c.appspot.com')
@@ -43,7 +43,7 @@ def timeStamp(currentTime, picturesURI, pictureName):
     # Execute the command
     call([timestampCommand], shell=True)
     print("We have timestamped the picture.")
-    imageBlob = bucket.blob("%s" % pictureName)
+    imageBlob = bucket.blob("images/%s" % pictureName)
     imageBlob.upload_from_filename(filePath)
 
 
@@ -55,8 +55,3 @@ while True:
         currentTime = getTime()
         pictureName = captureImage(currentTime, picturesURI)
         timeStamp(currentTime, picturesURI, pictureName)
-
-
-
-
-

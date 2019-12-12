@@ -33,5 +33,5 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pi/AppPyCharm/iotmotionsen
 firebase = firebase.FirebaseApplication('https://iotmotionsensor-e737c.firebaseio.com')
 client = storage.Client()
 bucket = client.get_bucket('iotmotionsensor-e737c.appspot.com')
-imageBlob = bucket.blob("%s" % pictureName)
+imageBlob = bucket.blob("images/%s" % pictureName)
 imageBlob.upload_from_filename(filePath)
