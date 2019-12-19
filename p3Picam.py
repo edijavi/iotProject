@@ -1,3 +1,4 @@
+# www.raspberrypi.org/phpBB3/viewtopic.php?f=43&t=45235
 # You need to install PIL to run this script
 # type "sudo apt-get install python-imaging-tk" in an terminal window to do this
 
@@ -22,26 +23,14 @@ threshold = 10
 sensitivity = 20
 forceCapture = True
 forceCaptureTime = 60 * 60  # Once an hour
-filepath = "/home/pi/picam"
-filenamePrefix = "capture"
-diskSpaceToReserve = 40 * 1024 * 1024  # Keep 40 mb free on disk
 cameraSettings = ""
-
-# settings of the photos to save
-saveWidth = 1296
-saveHeight = 972
-saveQuality = 15  # Set jpeg quality (0 to 100)
-
 # Test-Image settings
 testWidth = 100
 testHeight = 75
-
 # this is the default setting, if the whole image should be scanned for changed pixel
 testAreaCount = 1
-testBorders = [[[1, testWidth], [1,
-                                 testHeight]]]  # [ [[start pixel on left side,end pixel on right side],[start pixel on top side,stop pixel on bottom side]] ]
+testBorders = [[[1, testWidth], [1, testHeight]]]  # [ [[start pixel on left side,end pixel on right side],[start pixel on top side,stop pixel on bottom side]] ]
 # testBorders are NOT zero-based, the first pixel is 1 and the last pixel is testWith or testHeight
-
 # with "testBorders", you can define areas, where the script should scan for changed pixel
 # for example, if your picture looks like this:
 #
@@ -49,16 +38,13 @@ testBorders = [[[1, testWidth], [1,
 #     ........
 #     ........
 #
-# "." is a street or a house, "X" are trees which move arround like crazy when the wind is blowing
+# "." is a street or a house, "X" are trees which move around like crazy when the wind is blowing
 # because of the wind in the trees, there will be taken photos all the time. to prevent this, your setting might look like this:
-
 # testAreaCount = 2
 # testBorders = [ [[1,50],[1,75]], [[51,100],[26,75]] ] # area y=1 to 25 not scanned in x=51 to 100
-
-# even more complex example
+# even more complex example:
 # testAreaCount = 4
 # testBorders = [ [[1,39],[1,75]], [[40,67],[43,75]], [[68,85],[48,75]], [[86,100],[41,75]] ]
-
 # in debug mode, a file debug.bmp is written to disk with marked changed pixel an with marked border of scan-area
 # debug mode should only be turned on while testing the parameters above
 debugMode = False  # False or True
@@ -75,36 +61,6 @@ def captureTestImage(settings, width, height):
     buffer = im.load()
     imageData.close()
     return im, buffer
-
-
-# Save a full size image to disk
-def saveImage(settings, width, height, quality, diskSpaceToReserve):
-    keepDiskSpaceFree(diskSpaceToReserve)
-    time = datetime.now()
-    filename = filepath + "/" + filenamePrefix + "-%04d%02d%02d-%02d%02d%02d.jpg" % (
-    time.year, time.month, time.day, time.hour, time.minute, time.second)
-    subprocess.call(
-        "raspistill %s -w %s -h %s -t 200 -e jpg -q %s -n -o %s" % (settings, width, height, quality, filename),
-        shell=True)
-    print("Captured %s" % filename)
-
-
-# Keep free space above given level
-def keepDiskSpaceFree(bytesToReserve):
-    if (getFreeSpace() < bytesToReserve):
-        for filename in sorted(os.listdir(filepath + "/")):
-            if filename.startswith(filenamePrefix) and filename.endswith(".jpg"):
-                os.remove(filepath + "/" + filename)
-                print("Deleted %s/%s to avoid filling disk" % (filepath, filename))
-                if (getFreeSpace() > bytesToReserve):
-                    return
-
-
-# Get available disk space
-def getFreeSpace():
-    st = os.statvfs(filepath + "/")
-    du = st.f_bavail * st.f_frsize
-    return du
 
 
 def motion():
@@ -169,7 +125,6 @@ def motion():
         if takePicture:
             lastCapture = time.time()
             return True
-            # saveImage(cameraSettings, saveWidth, saveHeight, saveQuality, diskSpaceToReserve)
         else:
             return False
 
