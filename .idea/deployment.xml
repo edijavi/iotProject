@@ -2,10 +2,17 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="Always" serverName="pi@10.176.241.17:22">
     <serverData>
+      <paths name="pi@10.176.241.12:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pi/AppPyCharm" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="pi@10.176.241.17:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_749" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/pycharm_project_313" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
