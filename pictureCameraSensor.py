@@ -1,28 +1,18 @@
 import os
 import picamera
 import p3Picam
+import saveCloud
 from datetime import datetime
 from subprocess import call
 
-from google.cloud import storage
-from firebase import firebase
-
 picturesURI = "/home/pi/AppPyCharm/Pictures/"
-diskSpaceToReserve = 40 * 1024 * 1024  # Keep 40 mb free on disk
+diskSpaceToReserve = 7.08 * 1024 * 1024 * 1024  # Keep 7Gb free on disk
 filenamePrefix = "IOT"
 
 
-
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pi/AppPyCharm/iotmotionsensor-e737c-firebase-adminsdk-byfm4-2183495c4a.json"
-firebase = firebase.FirebaseApplication('https://iotmotionsensor-e737c.firebaseio.com')
-client = storage.Client()
-bucket = client.get_bucket('iotmotionsensor-e737c.appspot.com')
-
-
-def captureImage(currentTime, picturesURI, diskSpaceToReserve):
-    keepDiskSpaceFree(diskSpaceToReserve)
+def captureImage(currentTime, picturesURI):
     # Generate the picture's name
-    pictureName = filenamePrefix + currentTime.strftime("%Y.%m.%d-%H%M%S") + '.png'
+    pictureName = filenamePrefix + currentTime.strftime("%Y.%m.%d-%H%M%S") + '.jpg'
     # Variable for file path
     filePath = picturesURI + pictureName
     with picamera.PiCamera() as camera:
@@ -50,17 +40,20 @@ def timeStamp(currentTime, filePath):
 
 
 # Keep free space above given level
-def keepDiskSpaceFree(bytesToReserve):
+def keepDiskSpaceFree(bytesToReserve, path):
     if getFreeSpace() < bytesToReserve:
-        for pictureName in sorted(os.listdir(picturesURI)):
-            if pictureName.startswith(filenamePrefix) and pictureName.endswith(".png"):
-                os.remove(filePath)
-                print("Deleted %s to avoid filling disk" % filePath)
-                if getFreeSpace() > bytesToReserve:
-                    return
+        os.chdir(path)
+        files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
+        oldest = files[0]
+        os.remove(oldest)
+        print("File %s deleted to to avoid filling disk" % oldest)
+        saveCloud.delete_blob(oldest)
+        if getFreeSpace() > bytesToReserve:
+            return
 
 
-# Get available disk space
+
+# Get available disk space at Raspberry Pi
 def getFreeSpace():
     st = os.statvfs(picturesURI)
     du = st.f_bavail * st.f_frsize
@@ -69,12 +62,18 @@ def getFreeSpace():
 
 motionState = False
 while True:
+    #Collecting the state of the camera sensor from P3Picam
     motionState = p3Picam.motion()
+
     print(motionState)
     if motionState:
+        keepDiskSpaceFree(diskSpaceToReserve, picturesURI)
+        #Collecting the current time
         currentTime = getTime()
-        pictureName, filePath = captureImage(currentTime, picturesURI, diskSpaceToReserve)
+        #Executing the captureImage where take the picture to be manipulated with timeStamp function
+        pictureName, filePath = captureImage(currentTime, picturesURI)
         timeStamp(currentTime, filePath)
         # Upload to Firebase
-        imageBlob = bucket.blob("images/%s" % pictureName)
-        imageBlob.upload_from_filename(filePath)
+        saveCloud.upload_blob(pictureName, filePath)
+
+

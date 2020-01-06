@@ -14,10 +14,6 @@ from PIL import Image
 # Motion detection settings:
 # Threshold          - how much a pixel has to change by to be marked as "changed"
 # Sensitivity        - how many changed pixels before capturing an image, needs to be higher if noisy view
-# ForceCapture       - whether to force an image to be captured every forceCaptureTime seconds, values True or False
-# filepath           - location of folder to save photos
-# filenamePrefix     - string that prefixes the file name for easier identification of files.
-# diskSpaceToReserve - Delete oldest images to avoid filling disk. How much byte to keep free on disk.
 # cameraSettings     - "" = no extra settings; "-hf" = Set horizontal flip of image; "-vf" = Set vertical flip; "-hf -vf" = both horizontal and vertical flip
 threshold = 10
 sensitivity = 20
