@@ -8,22 +8,20 @@ firebase = firebase.FirebaseApplication('https://iotmotionsensor-e737c.firebasei
 bucket_name = 'iotmotionsensor-e737c.appspot.com'
 
 
-def upload_blob(destination_blob_name, source_file_name):
+def upload_blob(fileName, source_file_name):
     """Uploads a file to the bucket."""
     # source_file_name = "local/path/to/file"
-    # destination_blob_name = "storage-object-name"
+    # fileName = "storage-object-name"
 
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob("images/%s" % destination_blob_name)
+    blob = bucket.blob("images/%s" % fileName)
 
     blob.upload_from_filename(source_file_name)
     blob.make_public()
     fileUrl = blob.public_url
     print(
-        "File {} uploaded to {}.".format(
-            source_file_name, destination_blob_name
-        ),
+        "File {} uploaded.".format(fileName),
         "Blob {} is publicly accessible at {}".format(
         blob.name, fileUrl)
     )
@@ -46,13 +44,12 @@ def delete_blob(blob_name):
     """Deletes a blob from the bucket."""
     # bucket_name = "your-bucket-name"
     # blob_name = "your-object-name"
-
     storage_client = storage.Client()
-
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob("images/%s" % blob_name)
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(blob_name)
     blob.delete()
+    print('Blob {} deleted.'.format(blob_name))
 
-    print("Blob {} deleted.".format("images/%s" % blob_name))
+
 
 
