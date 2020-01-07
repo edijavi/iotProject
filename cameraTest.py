@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 import picamera
-import saveCloud
+import storageFirebase
 
 picturesURI = "/home/pi/AppPyCharm/Pictures/"
 
@@ -28,4 +28,4 @@ def getTime():
 currentTime = getTime()
 pictureName, filePath = captureImage(currentTime, picturesURI)
 print("%s %s" % (filePath, pictureName))
-saveCloud.saveToFirebase(pictureName, filePath)
+storageFirebase.saveToFirebase(pictureName, filePath)
