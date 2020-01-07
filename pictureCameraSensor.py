@@ -1,7 +1,8 @@
 import os
 import picamera
 import p3Picam
-import saveCloud
+import storageFirebase
+import cloudFirestore
 from datetime import datetime
 from subprocess import call
 
@@ -46,11 +47,11 @@ def keepDiskSpaceFree(bytesToReserve, path):
         files = sorted(os.listdir(os.getcwd()), key=os.path.getmtime)
         oldest = files[0]
         os.remove(oldest)
+        storageFirebase.delete_blob(oldest)
+        cloudFirestore.delete_cloud_firestore(oldest)
         print("File %s deleted to to avoid filling disk" % oldest)
-        saveCloud.delete_blob(oldest)
         if getFreeSpace() > bytesToReserve:
             return
-
 
 
 # Get available disk space at Raspberry Pi
@@ -59,6 +60,7 @@ def getFreeSpace():
     du = st.f_bavail * st.f_frsize
     print("%i MB FREE" % ((du/1024)/1024))
     return du
+
 
 motionState = False
 while True:
@@ -74,6 +76,8 @@ while True:
         pictureName, filePath = captureImage(currentTime, picturesURI)
         timeStamp(currentTime, filePath)
         # Upload to Firebase
-        saveCloud.upload_blob(pictureName, filePath)
+        fileUrl = storageFirebase.upload_blob(pictureName, filePath)
+        cloudFirestore.add_cloud_firestore(pictureName, fileUrl)
+
 
 
