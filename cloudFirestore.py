@@ -8,14 +8,21 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 def add_cloud_firestore(file_name, fileUrl):
+    doc_ref = db.collection(u'images').document(u'%s' % file_name)
     data = {
         u'name': u'%s' % file_name,
         u'filepath': u'%s' % fileUrl
     }
-    # Add a new doc in collection 'cities' with ID 'LA'
-    db.collection(u'images').document(u'%s' % file_name).set(data)
+    doc_ref.set(data)
 
 def delete_cloud_firestore(file_name):
-    db.collection(u'images').document(u'%s' % file_name).delete()
+    doc_ref = db.collection(u'images').document(u'%s' % file_name)
+    doc = doc_ref.get()
+    if doc.exists:
+        doc_ref.dedoc_ref.delete()
+        print("Doc deleted.")
+
+    else:
+        print("Doc Not Found.")
 
 
