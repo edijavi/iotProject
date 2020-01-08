@@ -13,7 +13,7 @@ filenamePrefix = "IOT"
 
 def captureImage(currentTime, picturesURI):
     # Generate the picture's name
-    pictureName = filenamePrefix + currentTime.strftime("%Y.%m.%d-%H%M%S") + '.png'
+    pictureName = filenamePrefix + currentTime.strftime("%Y.%m.%d-%H%M%S") + '.jpg'
     # Variable for file path
     filePath = picturesURI + pictureName
     with picamera.PiCamera() as camera:
@@ -66,9 +66,8 @@ motionState = False
 while True:
     #Collecting the state of the camera sensor from P3Picam
     motionState = p3Picam.motion()
-
     print(motionState)
-    if motionState:
+    if motionState:#shootCamera
         keepDiskSpaceFree(diskSpaceToReserve, picturesURI)
         #Collecting the current time
         currentTime = getTime()
